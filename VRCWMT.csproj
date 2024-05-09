@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <StartupObject>VRCWMT.Startup</StartupObject>
+    <PlatformTarget>x64</PlatformTarget>
+    <ApplicationIcon>VRCWMT.ico</ApplicationIcon>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="VRCWMT.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="KPreisser.UI.TaskDialog" Version="1.0.0" />
+    <PackageReference Include="MagmaMc.BetterForms" Version="0.3.6" />
+    <PackageReference Include="MagmaMc.JEF" Version="5.0.1" />
+    <PackageReference Include="MagmaMc.MagmaSimpleConfig" Version="2.1.1" />
+    <PackageReference Include="MagmaMc.UAS" Version="0.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="MagmaMC.SharedLibrary">
+      <HintPath>Libraries/MagmaMC.SharedLibrary.dll</HintPath>
+      <DocumentationFile>Libraries/MagmaMC.SharedLibrary.xml</DocumentationFile>
+    </Reference>
+    <Reference Include="OpenVRChatAPI">
+      <HintPath>Libraries/OpenVRChatAPI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="AppResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AppResources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="AddWorld.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="WelcomeWizard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="AddPlayer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="AppResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>
