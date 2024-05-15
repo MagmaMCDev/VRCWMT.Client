@@ -128,7 +128,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
             Name = "WelcomeWizard";
-            Text = "VRCWEditor";
+            Text = "Select Instance";
             FormClosing += WelcomeWizard_FormClosing;
             Load += WelcomeWizard_Load;
             betterPanel2.ResumeLayout(false);

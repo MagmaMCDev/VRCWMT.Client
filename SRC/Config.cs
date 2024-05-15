@@ -12,7 +12,7 @@ public static class Config
     private static readonly SimpleConfig Conf = new(Path.Combine(Dir, Filename));
     public static void Setup()
     {
-        if (Directory.Exists(Dir))
+        if (!Directory.Exists(Dir))
             Directory.CreateDirectory(Dir);
         if (!File.Exists(Path.Combine(Dir, Filename)))
             File.WriteAllBytes(Path.Combine(Dir, Filename), Array.Empty<byte>());

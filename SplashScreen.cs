@@ -9,25 +9,29 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace VRCWMT
+namespace VRCWMT;
+
+public partial class SplashScreen : Form
 {
-    public partial class SplashScreen: Form
+    public FormRounder Rounder;
+    public SplashScreen()
     {
-        public FormRounder Rounder;
-        public SplashScreen()
-        {
-            InitializeComponent();
-            Rounder = new FormRounder(this);
-        }
+        InitializeComponent();
+        Rounder = new FormRounder(this);
+    }
 
-        private void Drag(object sender, MouseEventArgs e)
-        {
-            Rounder.Object_Draggable();
-        }
+    private void Drag(object sender, MouseEventArgs e)
+    {
+        Rounder.Object_Draggable();
+    }
 
-        private void pictureBox1_Click(object sender, EventArgs e)
-        {
+    private void pictureBox1_Click(object sender, EventArgs e)
+    {
 
-        }
+    }
+
+    private void Loaded(object sender, EventArgs e)
+    {
+        label1.Text += "0.3.0";
     }
 }

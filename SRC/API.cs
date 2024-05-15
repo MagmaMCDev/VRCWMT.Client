@@ -12,7 +12,7 @@ namespace VRCWMT;
 
 public static class API
 {
-    private static readonly ConcurrentBag<HttpClient> _httpClientBag = new ConcurrentBag<HttpClient>();
+    private static readonly ConcurrentBag<HttpClient> _httpClientBag = new();
     private static readonly ConcurrentDictionary<string, VRCW> _worldCache = new();
 
 
@@ -23,7 +23,7 @@ public static class API
 
     private static HttpClient GetHttpClient()
     {
-        if (_httpClientBag.TryTake(out HttpClient httpClient))
+        if (_httpClientBag.TryTake(out var httpClient))
         {
             return httpClient;
         }
@@ -36,19 +36,18 @@ public static class API
             return httpClient;
         }
     }
-    private static async Task<bool> CheckStatus()
+    public static async Task<bool> CheckStatus()
     {
-        using (HttpClient httpClient = GetHttpClient())
+        using HttpClient httpClient = GetHttpClient();
+        try
         {
-            try
-            {
-                HttpResponseMessage response = await httpClient.GetAsync("/status");
-                return response.IsSuccessStatusCode;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            httpClient.Timeout = TimeSpan.FromSeconds(4);
+            using HttpResponseMessage response = await httpClient.GetAsync("/status");
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception)
+        {
+            return false;
         }
     }
 
@@ -56,30 +55,30 @@ public static class API
     {
         _httpClientBag.Add(httpClient);
     }
-
-    public static async Task<bool> AddWorldAsync(string worldName, string worldDescription, string githubRepo, byte[] imageData, string imageExtension)
+    public static async Task<string> AddWorldAsync(string worldName, string worldDescription, string githubRepo, byte[] imageData, string imageExtension)
     {
         var httpClient = GetHttpClient();
         try
         {
             MultipartFormDataContent content = new MultipartFormDataContent
-                {
-                    { new StringContent(worldName), "WorldName" },
-                    { new StringContent(worldDescription), "WorldDescription" },
-                    { new StringContent(githubRepo), "GithubRepo" }
-                };
+            {
+                { new StringContent(worldName), "WorldName" },
+                { new StringContent(worldDescription), "WorldDescription" },
+                { new StringContent(githubRepo), "GithubRepo" }
+            };
 
             ByteArrayContent imageContent = new ByteArrayContent(imageData);
             imageContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
             content.Add(imageContent, "file", $"image.{imageExtension}");
 
-            HttpResponseMessage response = await httpClient.PostAsync("/Worlds", content);
+            HttpResponseMessage response = await httpClient.PostAsync("Worlds", content);
             response.EnsureSuccessStatusCode();
-            return true;
+            return await response.Content.ReadAsStringAsync();
         }
-        catch
+        catch (Exception ex)
         {
-            return false;
+            Console.WriteLine($"Error: {ex.Message}");
+            return "";
         }
         finally
         {
@@ -120,6 +119,19 @@ public static class API
         }
     }
 
+    public static string[]? GetWorldStaff(string WorldID)
+    {
+        var httpClient = GetHttpClient();
+        try
+        {
+            return JsonSerializer.Deserialize<string[]>(httpClient.GetStringAsync($"Worlds/{WorldID}/SiteAdmins").Result)!;
+        }
+        catch { return null; }
+        finally
+        {
+            ReturnHttpClient(httpClient);
+        }
+    }
     public static string[] GetCommits(string WorldID)
     {
         var httpClient = GetHttpClient();
@@ -142,8 +154,8 @@ public static class API
             if (_worldCache.TryGetValue(id, out var cachedWorld))
                 return cachedWorld;
 
-            HttpResponseMessage response = httpClient.GetAsync($"Worlds/{id}").GetResult();
-            HttpContent content = response.Content;
+            using HttpResponseMessage response = httpClient.GetAsync($"Worlds/{id}").GetResult();
+            using HttpContent content = response.Content;
             VRCW? World = JsonSerializer.Deserialize<VRCW>(content.ReadAsStringAsync().Result);
             if (World != null)
                 World.ID = id;
@@ -165,9 +177,9 @@ public static class API
         var httpClient = GetHttpClient();
         try
         {
-            HttpResponseMessage response = httpClient.GetAsync($"Worlds/{worldId}/{username}").GetResult();
+            using HttpResponseMessage response = httpClient.GetAsync($"Worlds/{worldId}/{username}").GetResult();
             HttpContent content = response.Content;
-            string res = content.ReadAsStringAsync().Result ?? string.Empty;
+            var res = content.ReadAsStringAsync().Result ?? string.Empty;
             return JsonSerializer.Deserialize<SiteUser>(res)!;
         }
         catch
@@ -180,15 +192,271 @@ public static class API
         }
     }
 
+    public static async Task<bool> AddGroup(string worldID, string groupName, string permissions)
+    {
+        var httpClient = GetHttpClient();
+        try
+        {
+            var formData = new Dictionary<string, string>
+        {
+            { "GroupName", groupName },
+            { "Permissions", permissions },
+            { "FormType", "ADD" }
+        };
+
+            var content = new FormUrlEncodedContent(formData);
+
+            HttpResponseMessage response = await httpClient.PostAsync($"Worlds/{worldID}/Groups", content);
+            response.EnsureSuccessStatusCode();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+        finally
+        {
+            ReturnHttpClient(httpClient);
+        }
+    }
+    public static async Task<bool> RemoveGroup(string worldID, string groupName)
+    {
+        var httpClient = GetHttpClient();
+        try
+        {
+            var formData = new Dictionary<string, string>
+        {
+            { "GroupName", groupName },
+            { "FormType", "REMOVE" }
+        };
+
+            var content = new FormUrlEncodedContent(formData);
+
+            HttpResponseMessage response = await httpClient.PostAsync($"Worlds/{worldID}/Groups", content);
+            response.EnsureSuccessStatusCode();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+        finally
+        {
+            ReturnHttpClient(httpClient);
+        }
+    }
+
+    public static async Task<bool> AddPlayer(string worldID, string permissionGroup, string playerID, string message)
+    {
+        var httpClient = GetHttpClient();
+        try
+        {
+            var formData = new Dictionary<string, string>
+        {
+            { "WorldID", worldID },
+            { "PlayerID", playerID },
+            { "Message", message },
+            { "FormType", "ADD" }
+        };
+
+            var content = new FormUrlEncodedContent(formData);
+
+            HttpResponseMessage response = await httpClient.PostAsync($"Worlds/{worldID}/Groups/{permissionGroup}", content);
+            response.EnsureSuccessStatusCode();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+        finally
+        {
+            ReturnHttpClient(httpClient);
+        }
+    }
+    public static async Task<bool> RemovePlayer(string worldID, string permissionGroup, string playerID, string message)
+    {
+        var httpClient = GetHttpClient();
+        try
+        {
+            var formData = new Dictionary<string, string>
+        {
+            { "WorldID", worldID },
+            { "PlayerID", playerID },
+            { "Message", message },
+            { "FormType", "REMOVE" }
+        };
+
+            var content = new FormUrlEncodedContent(formData);
+
+            HttpResponseMessage response = await httpClient.PostAsync($"Worlds/{worldID}/Groups/{permissionGroup}", content);
+            response.EnsureSuccessStatusCode();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+        finally
+        {
+            ReturnHttpClient(httpClient);
+        }
+    }
+
+    public static async Task<bool> AddWorldStaff(string worldID, string username)
+    {
+        var httpClient = GetHttpClient();
+        try
+        {
+            var formData = new Dictionary<string, string>
+            {
+                { "User", username },
+                { "FormType", "ADD" }
+            };
+
+            var content = new FormUrlEncodedContent(formData);
+
+            HttpResponseMessage response = await httpClient.PostAsync($"Worlds/{worldID}/SiteAdmins", content);
+            response.EnsureSuccessStatusCode();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+        finally
+        {
+            ReturnHttpClient(httpClient);
+        }
+    }
+    public static async Task<bool> RemoveWorldStaff(string worldID, string username)
+    {
+        var httpClient = GetHttpClient();
+        try
+        {
+            var formData = new Dictionary<string, string>
+            {
+                { "User", username },
+                { "FormType", "REMOVE" }
+            };
+
+            var content = new FormUrlEncodedContent(formData);
+
+            HttpResponseMessage response = await httpClient.PostAsync($"Worlds/{worldID}/SiteAdmins", content);
+            response.EnsureSuccessStatusCode();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+        finally
+        {
+            ReturnHttpClient(httpClient);
+        }
+    }
+
+    public static async Task<bool> EditWorldName(string worldID, string Name)
+    {
+        var httpClient = GetHttpClient();
+        try
+        {
+            var formData = new Dictionary<string, string>
+            {
+                { "Value", Name },
+            };
+
+            var content = new FormUrlEncodedContent(formData);
+
+            HttpResponseMessage response = await httpClient.PostAsync($"Worlds/{worldID}/Name", content);
+            response.EnsureSuccessStatusCode();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+        finally
+        {
+            ReturnHttpClient(httpClient);
+        }
+    }
+
+    public static async Task<bool> EditWorldDescription(string worldID, string Description)
+    {
+        var httpClient = GetHttpClient();
+        try
+        {
+            var formData = new Dictionary<string, string>
+            {
+                { "Value", Description },
+            };
+
+            var content = new FormUrlEncodedContent(formData);
+
+            HttpResponseMessage response = await httpClient.PostAsync($"Worlds/{worldID}/Description", content);
+            response.EnsureSuccessStatusCode();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+        finally
+        {
+            ReturnHttpClient(httpClient);
+        }
+    }
+
+
+    public static async Task<bool> AddPlayer(this VRCW world, string groupName, string playerID, string message) =>
+       await AddPlayer(world.ID, groupName, playerID, message);
+    public static async Task<bool> RemovePlayer(this VRCW world, string groupName, string playerID, string message) =>
+        await RemovePlayer(world.ID, groupName, playerID, message);
+
+    public static async Task<bool> AddGroup(this VRCW world, string groupName, string permissions) =>
+        await AddGroup(world.ID, groupName, permissions);
+    public static async Task<bool> RemoveGroup(this VRCW world, string groupName) =>
+        await RemoveGroup(world.ID, groupName);
+
+    public static async Task<bool> AddStaff(this VRCW world, string username) =>
+        await AddWorldStaff(world.ID, username);
+    public static async Task<bool> RemoveStaff(this VRCW world, string username) =>
+        await RemoveWorldStaff(world.ID, username);
+    public static string[]? GetStaff(this VRCW world) =>
+        GetWorldStaff(world.ID);
+    public static async Task<bool> EditWorldName(this VRCW world, string Name) =>
+        await EditWorldDescription(world.ID, Name);
+    public static async Task<bool> EditWorldDescription(this VRCW world, string Description) =>
+        await EditWorldDescription(world.ID, Description);
+
 
     public static Dictionary<string, string[]>? GetGroups(this VRCW World)
     {
         var httpClient = GetHttpClient();
         try
         {
-            HttpContent Content = httpClient.GetAsync($"Worlds/{World.ID}/Groups").GetResult().Content;
-            string a = Content.ReadAsStringAsync().GetAwaiter().GetResult();
-            return JsonSerializer.Deserialize<Dictionary<string, string[]>>(a);
+            using HttpContent Content = httpClient.GetAsync($"Worlds/{World.ID}/Groups").GetResult().Content;
+            var Result = Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            return JsonSerializer.Deserialize<Dictionary<string, string[]>>(Result);
+        }
+        catch
+        {
+            return null;
+        }
+        finally
+        {
+            ReturnHttpClient(httpClient);
+        }
+    }
+    public static PlayerItem[]? GetPlayers(this VRCW World, string Group)
+    {
+        var httpClient = GetHttpClient();
+        try
+        {
+            using HttpContent Content = httpClient.GetAsync($"Worlds/{World.ID}/Groups/{Group}").GetResult().Content;
+            var Result = Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            return JsonSerializer.Deserialize<PlayerItem[]>(Result);
         }
         catch
         {

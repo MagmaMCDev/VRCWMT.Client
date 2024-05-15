@@ -1,42 +1,36 @@
-﻿using MagmaMc.BetterForms;
-using MagmaMc.JEF;
-using MagmaMc.UAS;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Text.RegularExpressions;
 
 namespace VRCWMT;
 
 public partial class AddPlayer : Form
 {
+    public bool Canceled = true;
+    public string playerID = "";
+    public string message = "";
     public AddPlayer()
     {
         InitializeComponent();
     }
-
-    private void CreateWorld_Load(object sender, EventArgs e)
+    private void AddPlayer_Click(object sender, EventArgs e)
     {
-
-    }
-
-    private void CreateButton_Click(object sender, EventArgs e)
-    {
-        if (WorldName_Input.Text.Length < 5)
+        if (!Regex.Match(PlayerID.Text.ToLower(), @"^(usr_)?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$").Success)
         {
-            MessageBox.Show("WorldName Invalid", "VRCWEditor", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("PlayerID Invalid", "VRCWMT", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
-        Application.Restart();
-        Environment.Exit(0);
+        if (string.IsNullOrWhiteSpace(Message.Text))
+        {
+            MessageBox.Show("Commit Message Is Required", "VRCWMT", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+
+        playerID = PlayerID.Text.ToLower().StartsWith("usr_") ? PlayerID.Text.ToLower() : "usr_" + PlayerID.Text.ToLower();
+        message = Message.Text;
+        Canceled = false;
+        Close();
     }
 
-    private void Description_Input_TextChanged(object sender, EventArgs e)
+    private void AddPlayer_Load(object sender, EventArgs e)
     {
 
     }
