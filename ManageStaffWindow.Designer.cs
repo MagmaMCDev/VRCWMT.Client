@@ -2,7 +2,7 @@
 
 namespace VRCWMT;
 
-partial class ManageStaffForm
+partial class ManageStaffWindow
 {
     /// <summary>
     /// Required designer variable.
@@ -37,6 +37,8 @@ partial class ManageStaffForm
         betterPanel3 = new BetterPanel();
         WorldDesc_Input = new RichTextBox();
         SaveWorldDetails = new BetterButton();
+        betterRadioButton1 = new BetterRadioButton();
+        betterRadioButton2 = new BetterRadioButton();
         betterPanel1.SuspendLayout();
         betterPanel2.SuspendLayout();
         betterPanel3.SuspendLayout();
@@ -44,6 +46,7 @@ partial class ManageStaffForm
         // 
         // betterPanel1
         // 
+        betterPanel1.BackColor = Color.FromArgb(25, 26, 27);
         betterPanel1.BorderColor = Color.DeepSkyBlue;
         betterPanel1.BorderCurve = 10F;
         betterPanel1.BorderSize = 4F;
@@ -55,6 +58,7 @@ partial class ManageStaffForm
         // 
         // UsersPanel
         // 
+        UsersPanel.BackColor = Color.FromArgb(25, 26, 27);
         UsersPanel.Location = new Point(9, 31);
         UsersPanel.Name = "UsersPanel";
         UsersPanel.Size = new Size(336, 282);
@@ -62,6 +66,7 @@ partial class ManageStaffForm
         // 
         // betterPanel2
         // 
+        betterPanel2.BackColor = Color.FromArgb(25, 26, 27);
         betterPanel2.BorderColor = Color.DeepSkyBlue;
         betterPanel2.BorderCurve = 10F;
         betterPanel2.BorderSize = 4F;
@@ -73,6 +78,7 @@ partial class ManageStaffForm
         // 
         // WorldName_Input
         // 
+        WorldName_Input.BackColor = Color.FromArgb(25, 26, 27);
         WorldName_Input.BorderStyle = BorderStyle.None;
         WorldName_Input.Cursor = Cursors.IBeam;
         WorldName_Input.Font = new Font("Segoe UI Variable Small", 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -96,6 +102,7 @@ partial class ManageStaffForm
         // 
         // WorldDesc_Input
         // 
+        WorldDesc_Input.BackColor = Color.FromArgb(25, 26, 27);
         WorldDesc_Input.BorderStyle = BorderStyle.None;
         WorldDesc_Input.DetectUrls = false;
         WorldDesc_Input.Location = new Point(7, 6);
@@ -128,17 +135,52 @@ partial class ManageStaffForm
         SaveWorldDetails.Value = null;
         SaveWorldDetails.Click += SaveWorldDetails_Click;
         // 
-        // ManageStaffForm
+        // betterRadioButton1
+        // 
+        betterRadioButton1.AutoSize = true;
+        betterRadioButton1.CheckedColor = Color.MediumSlateBlue;
+        betterRadioButton1.Location = new Point(362, 294);
+        betterRadioButton1.MinimumSize = new Size(0, 21);
+        betterRadioButton1.Name = "betterRadioButton1";
+        betterRadioButton1.Padding = new Padding(10, 0, 0, 0);
+        betterRadioButton1.Size = new Size(100, 21);
+        betterRadioButton1.TabIndex = 0;
+        betterRadioButton1.TabStop = true;
+        betterRadioButton1.Text = "Read access";
+        betterRadioButton1.UnCheckedColor = Color.Gray;
+        betterRadioButton1.UseVisualStyleBackColor = true;
+        betterRadioButton1.CheckedChanged += UpdateAccess;
+        // 
+        // betterRadioButton2
+        // 
+        betterRadioButton2.AutoSize = true;
+        betterRadioButton2.CheckedColor = Color.MediumSlateBlue;
+        betterRadioButton2.Location = new Point(362, 267);
+        betterRadioButton2.MinimumSize = new Size(0, 21);
+        betterRadioButton2.Name = "betterRadioButton2";
+        betterRadioButton2.Padding = new Padding(10, 0, 0, 0);
+        betterRadioButton2.Size = new Size(134, 21);
+        betterRadioButton2.TabIndex = 6;
+        betterRadioButton2.TabStop = true;
+        betterRadioButton2.Text = "Read/Write access";
+        betterRadioButton2.UnCheckedColor = Color.Gray;
+        betterRadioButton2.UseVisualStyleBackColor = true;
+        betterRadioButton2.CheckedChanged += UpdateAccess;
+        // 
+        // ManageStaffWindow
         // 
         AutoScaleDimensions = new SizeF(7F, 16F);
         AutoScaleMode = AutoScaleMode.Font;
+        BackColor = Color.FromArgb(40, 41, 42);
         ClientSize = new Size(738, 338);
+        Controls.Add(betterRadioButton2);
+        Controls.Add(betterRadioButton1);
         Controls.Add(SaveWorldDetails);
         Controls.Add(betterPanel3);
         Controls.Add(betterPanel2);
         Controls.Add(betterPanel1);
         FormBorderStyle = FormBorderStyle.Fixed3D;
-        Name = "ManageStaffForm";
+        Name = "ManageStaffWindow";
         Text = "Manage World";
         Load += Form_Loaded;
         betterPanel1.ResumeLayout(false);
@@ -146,6 +188,7 @@ partial class ManageStaffForm
         betterPanel2.PerformLayout();
         betterPanel3.ResumeLayout(false);
         ResumeLayout(false);
+        PerformLayout();
     }
 
     #endregion
@@ -157,4 +200,6 @@ partial class ManageStaffForm
     private BetterPanel betterPanel3;
     private RichTextBox WorldDesc_Input;
     private BetterButton SaveWorldDetails;
+    private BetterRadioButton betterRadioButton1;
+    private BetterRadioButton betterRadioButton2;
 }

@@ -57,7 +57,7 @@ public partial class AddWorld : Form
                         icon: TaskDialogStandardIcon.Information);
                     Close();
                     Config.WorldID = Success;
-                    Config.Write();
+                    Config.WriteConfig();
                     Application.Restart();
                     Dispose();
                     return;

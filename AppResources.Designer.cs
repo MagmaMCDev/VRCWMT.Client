@@ -83,6 +83,16 @@ namespace VRCWMT {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Exampleimage {
+            get {
+                object obj = ResourceManager.GetObject("Exampleimage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Icon_New {
             get {
                 object obj = ResourceManager.GetObject("Icon_New", resourceCulture);
@@ -156,6 +166,26 @@ namespace VRCWMT {
         internal static System.Drawing.Bitmap Material_Symbols_Remove {
             get {
                 object obj = ResourceManager.GetObject("Material_Symbols_Remove", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Material_symbols_Search {
+            get {
+                object obj = ResourceManager.GetObject("Material_symbols_Search", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Material_symbols_Settings {
+            get {
+                object obj = ResourceManager.GetObject("Material_symbols_Settings", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

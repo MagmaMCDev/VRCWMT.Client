@@ -9,16 +9,17 @@ using VRCWMT.Models;
 using KPreisser.UI;
 using TaskDialog = KPreisser.UI.TaskDialog;
 using MagmaMc.BetterForms;
+using static VRCWMT.Config;
 
 namespace VRCWMT;
 
-public partial class MainForm : Form
+public partial class MainWindow : Form
 {
     private VRCW? CurrentWorld = null;
     private GithubUser? githubUser = null;
     private string CurrentGroup = "";
     private string[]? previousGroups;
-
+    public static bool WriteMode = true;
 
     private readonly Dictionary<string, Control[]> PlayerControls = new();
     private readonly Dictionary<string, Control[]> GroupControls = new();
@@ -27,7 +28,7 @@ public partial class MainForm : Form
 
     private readonly SplashScreen splashScreen;
     private ColoredPictureBox AddButton;
-    public MainForm(SplashScreen ss)
+    public MainWindow(SplashScreen ss)
     {
         splashScreen = ss;
         InitializeComponent();
@@ -59,7 +60,7 @@ public partial class MainForm : Form
             {
                 var authToken = request.Split('=')[1].Split(' ')[0];
                 Config.GithubAuth = authToken;
-                Config.Write();
+                Config.WriteConfig();
                 break;
             }
             else
@@ -74,12 +75,12 @@ public partial class MainForm : Form
 
     private async void Form_Load(object sender, EventArgs e)
     {
-        Config.Read();
-#region Form Controls
+        Config.ReadConfig();
+        #region Form Controls
         AddButton = new ColoredPictureBox
         {
             Image = AppResources.Material_Symbols_Add,
-            Location = new Point(375, 8),
+            Location = new Point(370, 6),
             Name = "AddPlayer",
             Size = new Size(32, 32),
             SizeMode = PictureBoxSizeMode.Zoom,
@@ -182,7 +183,7 @@ public partial class MainForm : Form
         ColoredPictureBox RemoveGroupButton = new ColoredPictureBox
         {
             Image = AppResources.Material_Symbols_Remove,
-            Location = new Point(290-32, 8),
+            Location = new Point(290 - 32, 8),
             Name = "RemoveGroup",
             Size = new Size(32, 32),
             SizeMode = PictureBoxSizeMode.Zoom,
@@ -216,7 +217,8 @@ public partial class MainForm : Form
                     {
                         UpdateGroups();
                     });
-                } catch { }
+                }
+                catch { }
                 EndData();
 
             }).Start();
@@ -224,11 +226,24 @@ public partial class MainForm : Form
 
         };
 
-        PlayersPanelBase.Controls.Add(AddButton);
-        GroupPanelBase.Controls.Add(AddGroupButton);
-        GroupPanelBase.Controls.Add(RemoveGroupButton);
+        if (WriteMode)
+        {
+            PlayersPanelBase.Controls.Add(AddButton);
+            GroupPanelBase.Controls.Add(AddGroupButton);
+            GroupPanelBase.Controls.Add(RemoveGroupButton);
+        }
 
-#endregion 
+        GroupPanelInternal.AutoScroll = true;
+        GroupPanelInternal.HorizontalScroll.Visible = false;
+        GroupPanelInternal.VerticalScroll.Visible = true;
+        GroupPanelInternal.VerticalScroll.Enabled = true;
+        PlayersPanelInternal.AutoScroll = true;
+        PlayersPanelInternal.HorizontalScroll.Visible = false;
+        PlayersPanelInternal.HorizontalScroll.Enabled = false;
+        PlayersPanelInternal.VerticalScroll.Visible = true;
+        PlayersPanelInternal.VerticalScroll.Enabled = true;
+
+        #endregion
 
         #region SplashScreen
         await Task.Delay(150);
@@ -237,17 +252,18 @@ public partial class MainForm : Form
         if (LatestV == null)
         {
             splashScreen.Dispose();
-            if (TaskDialog.Show(text: "Failed To Check Client Version Retry?",
+            var ae = TaskDialog.Show(text: "Failed To Check Client Version Retry?",
                 title: "VRCWMT",
-                buttons: TaskDialogButtons.Retry | TaskDialogButtons.Abort,
-                icon: TaskDialogStandardIcon.Information) == TaskDialogResult.Abort)
+                buttons: TaskDialogButtons.Retry | TaskDialogButtons.Abort | TaskDialogButtons.Ignore,
+                icon: TaskDialogStandardIcon.Information);
+            if (ae == TaskDialogResult.Abort)
             {
                 Commits.Text = "";
                 Dispose();
                 Environment.Exit(-1);
                 return;
             }
-            else
+            else if (ae == TaskDialogResult.Retry)
             {
                 Commits.Text = "";
                 Dispose();
@@ -257,8 +273,43 @@ public partial class MainForm : Form
         }
         if (Client.Version < LatestV)
         {
-        
+            splashScreen.Hide();
+            if (TaskDialog.Show(text: "You are on an outdated version. Do you wish to update?",
+                                title: "VRCWMT",
+                                buttons: TaskDialogButtons.Yes | TaskDialogButtons.No,
+                                icon: TaskDialogStandardIcon.Information) == TaskDialogResult.Yes)
+            {
+                string updateUrl = LatestV.updateURL!.ToString();
+                string tempFilePath = Path.Combine(Path.GetTempPath(), "VRCWMT_Update.exe");
+
+                using (var client = new WebClient())
+                {
+                    client.DownloadFile(updateUrl, tempFilePath);
+                }
+
+                // Construct the arguments to relaunch the new version and terminate the old one
+                string currentExePath = Application.ExecutablePath;
+                string arguments = $"/C timeout 2 && move /Y \"{tempFilePath}\" \"{currentExePath}\" && start \"\" \"{currentExePath}\"";
+
+                ProcessStartInfo psi = new ProcessStartInfo("cmd.exe", arguments)
+                {
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                };
+
+                Process.Start(psi);
+                splashScreen.Dispose();
+                Commits.Text = "";
+                Dispose();
+                Environment.Exit(0);
+            }
+            else
+            {
+                splashScreen.Show();
+            }
         }
+
 
         splashScreen.Status.Text = "Logging In...";
         await Task.Delay(250);
@@ -295,9 +346,14 @@ public partial class MainForm : Form
                 splashScreen.Status.Text = "Loading Instance...";
                 CurrentWorld = API.GetWorld(Config.WorldID);
                 SiteUser? User = API.GetUser(Config.WorldID, githubUser.login);
+                if (User != null)
+                {
+                    user = User;
+                    WriteMode = !User.read || User.siteOwner;
+                }
                 if (User == null)
                     OpenWizard = true;
-                else if (!User.siteAdmin && !User.worldCreator && !User.siteOwner)
+                else if (!User.siteAdmin && !User.worldCreator && !User.siteOwner && !User.read)
                     OpenWizard = true;
                 else
                     new Thread(() =>
@@ -306,6 +362,7 @@ public partial class MainForm : Form
                         UpdateContainers();
                         EndData();
                     }).Start();
+                
             }
         }
         #endregion
@@ -359,9 +416,9 @@ public partial class MainForm : Form
                 {
                     if (!string.IsNullOrEmpty(Config.WorldID) && !string.IsNullOrEmpty(Config.GithubAuth))
                         UpdateContainers();
-                    for (byte i = 0; i < 10; i++)
+                    for (byte i = 0; i < UpdateTime; i++)
                         if (!IsDisposed && !Disposing)
-                            Thread.Sleep(2 * 1000);
+                            Thread.Sleep(1000);
                 }
                 else
                     return;
@@ -369,17 +426,19 @@ public partial class MainForm : Form
 
         }).Start();
     }
-
+    SiteUser user;
     private void LoadForm()
     {
+
+        WriteMode = !user.read || user.siteOwner;
         CurrentWorld = API.GetWorld(Config.WorldID)!;
         githubUser = Github.GetUserAsync(Config.GithubAuth).GetResult();
-        if (!API.GetUser(Config.WorldID, githubUser.login).worldCreator)
-        {
+        if (!user.worldCreator)
             ManageStaffButton.Visible = false;
-            // add more as needed
-        }
+
         Text = CurrentWorld.worldName;
+        if (user.read && !user.siteOwner)
+            Text += " READ MODE!";
         FormBorderStyle = FormBorderStyle.Fixed3D;
         ShowInTaskbar = true;
         for (var opacity = 0.0; opacity <= 1; opacity += 0.1)
@@ -395,7 +454,8 @@ public partial class MainForm : Form
         CurrentWorld = null;
         Initialized = false;
         Config.WorldID = "";
-        Config.Write();
+        Config.WriteConfig();
+        WriteMode = !user.read || user.siteOwner;
         WelcomeWizard welcomeWizard = new();
         welcomeWizard.ShowDialog();
         welcomeWizard.Dispose();
@@ -447,9 +507,7 @@ public partial class MainForm : Form
 
                         Invoke((MethodInvoker)delegate
                         {
-                            foreach (Control item in GroupPanelInternal.Controls)
-                                item.Dispose();
-                            GroupPanelInternal.Controls.Clear();
+                            DisposeGroups();
                             foreach (var item in currentGroups)
                             {
                                 BetterRadioButton checkBox = new BetterRadioButton
@@ -464,20 +522,13 @@ public partial class MainForm : Form
                                     CurrentGroup = checkBox.Text;
                                     UpdatePlayers();
                                 };
-                                // Add the control to the panel
                                 GroupPanelInternal.Controls.Add(checkBox);
-
                                 xIndex++;
                             }
 
-                            // Adjust panel height to fit all controls
-                            GroupPanelInternal.AutoScroll = true;
-                            GroupPanelInternal.VerticalScroll.Visible = true;
-                            GroupPanelInternal.VerticalScroll.Enabled = true;
                             GroupPanelInternal.VerticalScroll.Maximum = panelHeight;
                         });
 
-                        // Update the previous groups
                         previousGroups = currentGroups;
                     }
                 }
@@ -508,12 +559,10 @@ public partial class MainForm : Form
                     ushort maxControlsPerColumn = 7;
                     var panelHeight = maxControlsPerColumn * (controlHeight + margin);
 
-                    Invoke((MethodInvoker)delegate
+                    PlayersPanelInternal.Invoke((MethodInvoker)delegate
                     {
-                        foreach (Control item in PlayersPanelInternal.Controls)
-                            item.Dispose();
-                        PlayerControls.Clear();
-                        PlayersPanelInternal.Controls.Clear();
+                        DisposePlayers();
+
                         AddButton.Visible = true;
                         foreach (PlayerItem item in Players)
                         {
@@ -538,54 +587,92 @@ public partial class MainForm : Form
                             };
                             InfoButton.MouseEnter += (Control, _) => (Control as ColoredPictureBox)!.OverlayColor = Color.LightBlue;
                             InfoButton.MouseLeave += (Control, _) => (Control as ColoredPictureBox)!.OverlayColor = Color.White;
-
-                            ColoredPictureBox DeleteButton = new ColoredPictureBox
+                            InfoButton.MouseDown += (Control, _) =>
                             {
-                                Image = AppResources.Material_symbols_Delete,
-                                Location = new Point(364, margin + (xIndex * (controlHeight + margin))),
-                                Name = "Delete",
-                                Size = new Size(32, 32),
-                                SizeMode = PictureBoxSizeMode.Zoom,
-                                TabIndex = 1,
-                                TabStop = false,
-                                OverlayColor = Color.White,
-                                Cursor = Cursors.Hand
+                                PlayerInfo player = new(CurrentWorld, CurrentGroup, item);
+                                if (!AllowMultipleWindows)
+                                {
+                                    Hide();
+                                    Opacity = 0.0f;
+                                    DisposePlayers();
+                                    if (FastGC)
+                                        GC.Collect();
+                                    player.ShowDialog();
+                                    player.Dispose();
+                                    Opacity = 1.0f;
+                                    Show(); new Thread(() =>
+                                    {
+                                        BeginData();
+                                        UpdatePlayers();
+                                        EndData();
+                                    }).Start();
+                                }
+                                else
+                                {
+                                    player.Show();
+                                    player.FormClosed += (_, _) =>
+                                    {
+                                        player.Dispose();
+                                    };
+                                }
+
                             };
-                            DeleteButton.MouseEnter += (Control, _) => (Control as ColoredPictureBox)!.OverlayColor = Color.Red;
-                            DeleteButton.MouseLeave += (Control, _) => (Control as ColoredPictureBox)!.OverlayColor = Color.White;
-                            DeleteButton.MouseDown += (_, _) =>
+
+                            if (WriteMode)
                             {
-                                InputData Data = InputBox.Show($"Please Provide A Reason For Removing The Player: {item.displayName}, From The Group: {CurrentGroup}", "VRCWMT", 1);
-                                if (Data.Canceled)
-                                    return;
-                                CurrentWorld.RemovePlayer(CurrentGroup, item.playerID, Data.Value).ConfigureAwait(false);
-                                foreach (Control item in PlayerControls[item.displayName])
-                                    item.Dispose();
+                                ColoredPictureBox DeleteButton = new ColoredPictureBox
+                                {
+                                    Image = AppResources.Material_symbols_Delete,
+                                    Location = new Point(364, margin + (xIndex * (controlHeight + margin))),
+                                    Name = "Delete",
+                                    Size = new Size(32, 32),
+                                    SizeMode = PictureBoxSizeMode.Zoom,
+                                    TabIndex = 1,
+                                    TabStop = false,
+                                    OverlayColor = Color.White,
+                                    Cursor = Cursors.Hand
+                                };
+                                DeleteButton.MouseEnter += (Control, _) => (Control as ColoredPictureBox)!.OverlayColor = Color.Red;
+                                DeleteButton.MouseLeave += (Control, _) => (Control as ColoredPictureBox)!.OverlayColor = Color.White;
+                                DeleteButton.MouseDown += (_, _) =>
+                                {
+                                    InputData Data = InputBox.Show($"Please Provide A Reason For Removing The Player: {item.displayName}, From The Group: {CurrentGroup}", "VRCWMT", 1);
+                                    if (Data.Canceled)
+                                        return;
+                                    CurrentWorld.RemovePlayer(CurrentGroup, item.playerID, Data.Value).ConfigureAwait(false);
+                                    foreach (Control item in PlayerControls[item.displayName])
+                                        item.Dispose();
 
-                                Control[] controls = new Control[PlayersPanelInternal.Controls.Count];
-                                PlayersPanelInternal.Controls.CopyTo(controls, 0);
-                                foreach (Control item in controls)
-                                    if (item.Disposing || item.IsDisposed) PlayersPanelInternal.Controls.Remove(item);
-                            };
+                                    Control[] controls = new Control[PlayersPanelInternal.Controls.Count];
+                                    PlayersPanelInternal.Controls.CopyTo(controls, 0);
+                                    foreach (Control item in controls)
+                                        if (item.Disposing || item.IsDisposed) PlayersPanelInternal.Controls.Remove(item);
+                                };
 
-                            PlayerControls.Add(item.displayName,
-                            [
-                                Username,
-                    InfoButton,
-                    DeleteButton
-                            ]);
+                                PlayerControls.Add(item.displayName,
+                                [
+                                    Username,
+                                    InfoButton,
+                                    DeleteButton
+                                ]);
 
+                                PlayersPanelInternal.Controls.Add(DeleteButton);
+
+                            }
+                            else
+                                PlayerControls.Add(item.displayName,
+                                [
+                                    Username,
+                                    InfoButton,
+                                ]);
                             PlayersPanelInternal.Controls.Add(Username);
                             PlayersPanelInternal.Controls.Add(InfoButton);
-                            PlayersPanelInternal.Controls.Add(DeleteButton);
 
                             xIndex++;
                         }
 
-                        PlayersPanelInternal.AutoScroll = true;
-                        PlayersPanelInternal.VerticalScroll.Visible = true;
-                        PlayersPanelInternal.VerticalScroll.Enabled = true;
                         PlayersPanelInternal.VerticalScroll.Maximum = panelHeight;
+                        ProcessPlayerSearch();
                     });
                 }
             }
@@ -593,7 +680,10 @@ public partial class MainForm : Form
             {
                 EndData();
             }
-        }).Start();
+        })
+        {
+            Priority = ThreadPriority.Highest
+        }.Start();
     }
 
     public void PublishCommit_Click(object? _, object? __)
@@ -607,12 +697,18 @@ public partial class MainForm : Form
         {
             BeginData();
             if (API.PushCommits(Config.WorldID))
-            {
-                Invoke((MethodInvoker)delegate
+                Commits.Invoke((MethodInvoker)delegate
                 {
                     Commits.Text = "";
                 });
-            }
+            else
+                Invoke((MethodInvoker)delegate
+                {
+                    TaskDialog.Show(text: "Failed To Push Commits!\nMake Sure You Are Not Sending To Many Requests.",
+                        title: "Push Commits",
+                        buttons: TaskDialogButtons.OK,
+                        icon: TaskDialogStandardIcon.Error);
+                });
             EndData();
         }).Start();
     }
@@ -632,9 +728,13 @@ public partial class MainForm : Form
         CurrentWorld = null;
         Initialized = false;
         Config.WorldID = "";
-        Config.Write();
+        Config.WriteConfig();
         this.Opacity = 0.0;
         this.ShowInTaskbar = false;
+        BeginData();
+        DisposeGroups();
+        DisposePlayers();
+        EndData();
         WelcomeWizard welcomeWizard = new();
         welcomeWizard.ShowDialog();
         welcomeWizard.Dispose();
@@ -659,21 +759,36 @@ public partial class MainForm : Form
 
     private void Window_Closing(object sender, FormClosingEventArgs e)
     {
-        if (!string.IsNullOrWhiteSpace(Commits.Text) && Initialized)
+        if (!string.IsNullOrWhiteSpace(Commits.Text) && Initialized && WarnBeforeClose && WriteMode)
         {
-            if (TaskDialog.Show(text: "Area You Sure You Want To Close You Have Unpublished Commits",
+            if (TaskDialog.Show(text: "Are You Sure You Want To Close You Have Unpublished Commits",
                 title: "VRCWMT",
                 buttons: TaskDialogButtons.Yes | TaskDialogButtons.No,
-                icon: TaskDialogStandardIcon.Information) == TaskDialogResult.No) return;
+                icon: TaskDialogStandardIcon.Information) == TaskDialogResult.No)
+            {
+                e.Cancel = true;
+                return;
+            };
+        }
+        if (AutoCloseInstance)
+        {
+            WorldID = "";
+            WriteConfig();
         }
         this.Opacity = 0.0f;
         this.ShowInTaskbar = false;
     }
 
-
     public void BeginData()
     {
-        Invoke((MethodInvoker)delegate
+        if (InvokeRequired)
+        {
+            Invoke((MethodInvoker)delegate
+            {
+                BeginData();
+            });
+        }
+        else
         {
             ContactingServerGIF.Visible = true;
             PublishCommitButton.Enabled = false;
@@ -681,11 +796,19 @@ public partial class MainForm : Form
             ManageStaffButton.Enabled = false;
             GroupPanelBase.Enabled = false;
             PlayersPanelBase.Enabled = false;
-        });
+        }
     }
+
     public void EndData()
     {
-        Invoke((MethodInvoker)delegate
+        if (InvokeRequired)
+        {
+            Invoke((MethodInvoker)delegate
+            {
+                EndData();
+            });
+        }
+        else
         {
             ContactingServerGIF.Visible = false;
             PublishCommitButton.Enabled = true;
@@ -693,14 +816,60 @@ public partial class MainForm : Form
             ManageStaffButton.Enabled = true;
             GroupPanelBase.Enabled = true;
             PlayersPanelBase.Enabled = true;
-        });
+            if (FastGC)
+                GC.Collect();
+        }
+    }
+
+    public void DisposeGroups()
+    {
+
+        if (InvokeRequired)
+        {
+            GroupPanelInternal.Invoke((MethodInvoker)delegate
+            {
+                BeginData();
+            });
+        }
+        else
+        {
+            var controls = GroupPanelInternal.Controls.Cast<Control>().ToArray();
+
+            for (int i = 0; i < controls.Length; i++)
+                controls[i].Dispose();
+
+            GroupPanelInternal.Controls.Clear();
+            GroupControls.Clear();
+        }
+    }
+    public void DisposePlayers()
+    {
+
+        if (InvokeRequired)
+        {
+            PlayersPanelInternal.Invoke((MethodInvoker)delegate
+            {
+                BeginData();
+            });
+        }
+        else
+        {
+            var controls = PlayersPanelInternal.Controls.Cast<Control>().ToArray();
+
+            for (int i = 0; i < controls.Length; i++)
+                controls[i].Dispose();
+
+            PlayersPanelInternal.Controls.Clear();
+            PlayerControls.Clear();
+            AddButton.Visible = false;
+        }
     }
 
     public void ManageStaff_Click(object? _, object? __)
     {
         if (!CanEdit)
             return;
-        ManageStaffForm manageStaff = new(CurrentWorld!);
+        ManageStaffWindow manageStaff = new(CurrentWorld!);
         Hide();
         Opacity = 0.0f;
         manageStaff.ShowDialog();
@@ -710,15 +879,85 @@ public partial class MainForm : Form
 
     public void ShowWindow()
     {
-        if (Initialized)
-            Show();
+        if (!Initialized)
+            return;
+        BeginData();
+        UpdatePlayers();
+        EndData();
+        Show();
     }
 
     public void HideWindow()
     {
-        if (Initialized)
-            Hide();
+        if (!Initialized)
+            return;
+        BeginData();
+        DisposePlayers();
+        EndData();
+        Hide();
     }
+
+    private void SettingsButton_Click(object sender, EventArgs e)
+    {
+        SettingsButton.Enabled = false;
+        SettingsWindow Settings = new SettingsWindow();
+        if (AllowMultipleWindows)
+        {
+            Settings.Show();
+            Settings.FormClosed += (_, _) =>
+            {
+                SettingsButton.Enabled = true;
+                Settings.Dispose();
+                if (FastGC)
+                    GC.Collect();
+            };
+        }else
+        {
+            Hide();
+            Opacity = 0.0f;
+            Settings.ShowDialog();
+            Settings.Dispose();
+            if (FastGC)
+                GC.Collect();
+            Opacity = 1.0f;
+            Show();
+            SettingsButton.Enabled = true;
+        }
+    }
+
+    private void PlayerSearch_TextChanged(object sender, EventArgs e) => ProcessPlayerSearch();
+    public void ProcessPlayerSearch()
+    {
+        string query = PlayerSearch.Text.ToLower();
+        var filteredPlayers = PlayerControls.Keys
+            .Where(name => name.ToLower().Contains(query))
+            .ToArray();
+
+        PlayersPanelInternal.Invoke((MethodInvoker)delegate
+        {
+            ushort xIndex = 0;
+            ushort controlHeight = 25;
+            ushort margin = 10;
+
+            foreach (var player in PlayerControls)
+            {
+                bool any = filteredPlayers.Contains(player.Key);
+                foreach (Control control in player.Value)
+                {
+                    control.Visible = any;
+                    if (control.Visible)
+                    {
+                        int newY = margin + (xIndex * (controlHeight + margin));
+                        control.Location = new Point(control.Location.X, newY);
+                    }
+                }
+                if (any)
+                    xIndex++;
+            }
+        });
+    }
+
+
     public bool CanEdit
     {
         get

@@ -1,6 +1,6 @@
 ﻿namespace VRCWMT
 {
-    partial class MainForm
+    partial class MainWindow
     {
         /// <summary>
         /// Required designer variable.
@@ -28,8 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            var resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             panel1 = new Panel();
+            SettingsButton = new PictureBox();
             CloseInstanceButton = new PictureBox();
             ManageStaffButton = new PictureBox();
             PublishCommitButton = new PictureBox();
@@ -43,7 +44,11 @@
             GroupPanelInternal = new Panel();
             PlayersPanelBase = new MagmaMc.BetterForms.BetterPanel();
             PlayersPanelInternal = new Panel();
+            betterPanel2 = new MagmaMc.BetterForms.BetterPanel();
+            pictureBox1 = new PictureBox();
+            PlayerSearch = new TextBox();
             panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)SettingsButton).BeginInit();
             ((System.ComponentModel.ISupportInitialize)CloseInstanceButton).BeginInit();
             ((System.ComponentModel.ISupportInitialize)ManageStaffButton).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PublishCommitButton).BeginInit();
@@ -52,11 +57,14 @@
             betterPanel1.SuspendLayout();
             GroupPanelBase.SuspendLayout();
             PlayersPanelBase.SuspendLayout();
+            betterPanel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // panel1
             // 
             panel1.BackColor = Color.FromArgb(25, 26, 27);
+            panel1.Controls.Add(SettingsButton);
             panel1.Controls.Add(CloseInstanceButton);
             panel1.Controls.Add(ManageStaffButton);
             panel1.Controls.Add(PublishCommitButton);
@@ -67,6 +75,17 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(803, 36);
             panel1.TabIndex = 0;
+            // 
+            // SettingsButton
+            // 
+            SettingsButton.Image = AppResources.Material_symbols_Settings;
+            SettingsButton.Location = new Point(703, -1);
+            SettingsButton.Name = "SettingsButton";
+            SettingsButton.Size = new Size(41, 37);
+            SettingsButton.SizeMode = PictureBoxSizeMode.Zoom;
+            SettingsButton.TabIndex = 6;
+            SettingsButton.TabStop = false;
+            SettingsButton.Click += SettingsButton_Click;
             // 
             // CloseInstanceButton
             // 
@@ -82,7 +101,7 @@
             // ManageStaffButton
             // 
             ManageStaffButton.Image = AppResources.Material_Symbols_ManageAccount;
-            ManageStaffButton.Location = new Point(703, 0);
+            ManageStaffButton.Location = new Point(656, -1);
             ManageStaffButton.Name = "ManageStaffButton";
             ManageStaffButton.Size = new Size(41, 37);
             ManageStaffButton.SizeMode = PictureBoxSizeMode.Zoom;
@@ -124,7 +143,7 @@
             // ContactingServerGIF
             // 
             ContactingServerGIF.BackColor = Color.FromArgb(40, 41, 42);
-            ContactingServerGIF.Image = AppResources.Contacting_Alt1;
+            ContactingServerGIF.Image = AppResources.Contacting;
             ContactingServerGIF.Location = new Point(9, 4);
             ContactingServerGIF.Name = "ContactingServerGIF";
             ContactingServerGIF.Size = new Size(36, 38);
@@ -135,6 +154,7 @@
             // betterPanel1
             // 
             betterPanel1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            betterPanel1.BackColor = Color.FromArgb(25, 26, 27);
             betterPanel1.BorderColor = Color.DeepSkyBlue;
             betterPanel1.BorderCurve = 10F;
             betterPanel1.BorderSize = 4F;
@@ -149,6 +169,7 @@
             // Commits
             // 
             Commits.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            Commits.BackColor = Color.FromArgb(25, 26, 27);
             Commits.Font = new Font("Segoe UI Variable Small", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
             Commits.ForeColor = SystemColors.WindowText;
             Commits.Location = new Point(16, 41);
@@ -171,6 +192,7 @@
             // GroupPanelBase
             // 
             GroupPanelBase.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            GroupPanelBase.BackColor = Color.FromArgb(25, 26, 27);
             GroupPanelBase.BorderColor = Color.DeepSkyBlue;
             GroupPanelBase.BorderCurve = 10F;
             GroupPanelBase.BorderSize = 4F;
@@ -182,30 +204,68 @@
             // 
             // GroupPanelInternal
             // 
-            GroupPanelInternal.Location = new Point(12, 34);
+            GroupPanelInternal.BackColor = Color.FromArgb(25, 26, 27);
+            GroupPanelInternal.Location = new Point(6, 32);
             GroupPanelInternal.Name = "GroupPanelInternal";
-            GroupPanelInternal.Size = new Size(332, 184);
+            GroupPanelInternal.Size = new Size(341, 184);
             GroupPanelInternal.TabIndex = 0;
             // 
-            // PLayersPanelBase
+            // PlayersPanelBase
             // 
+            PlayersPanelBase.BackColor = Color.FromArgb(25, 26, 27);
             PlayersPanelBase.BorderColor = Color.DeepSkyBlue;
             PlayersPanelBase.BorderCurve = 10F;
             PlayersPanelBase.BorderSize = 4F;
             PlayersPanelBase.Controls.Add(PlayersPanelInternal);
+            PlayersPanelBase.Controls.Add(betterPanel2);
             PlayersPanelBase.Location = new Point(12, 41);
-            PlayersPanelBase.Name = "PLayersPanelBase";
+            PlayersPanelBase.Name = "PlayersPanelBase";
             PlayersPanelBase.Size = new Size(427, 402);
             PlayersPanelBase.TabIndex = 3;
             // 
             // PlayersPanelInternal
             // 
-            PlayersPanelInternal.Location = new Point(11, 35);
+            PlayersPanelInternal.Location = new Point(6, 34);
             PlayersPanelInternal.Name = "PlayersPanelInternal";
-            PlayersPanelInternal.Size = new Size(410, 361);
+            PlayersPanelInternal.Size = new Size(416, 361);
             PlayersPanelInternal.TabIndex = 0;
             // 
-            // MainForm
+            // betterPanel2
+            // 
+            betterPanel2.BackColor = Color.FromArgb(35, 36, 37);
+            betterPanel2.BorderColor = Color.FromArgb(25, 26, 27);
+            betterPanel2.BorderCurve = 15F;
+            betterPanel2.BorderSize = 0F;
+            betterPanel2.Controls.Add(pictureBox1);
+            betterPanel2.Controls.Add(PlayerSearch);
+            betterPanel2.Location = new Point(5, 5);
+            betterPanel2.Name = "betterPanel2";
+            betterPanel2.Size = new Size(350, 31);
+            betterPanel2.TabIndex = 0;
+            // 
+            // pictureBox1
+            // 
+            pictureBox1.Image = AppResources.Material_symbols_Search;
+            pictureBox1.Location = new Point(5, 1);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(34, 29);
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox1.TabIndex = 1;
+            pictureBox1.TabStop = false;
+            // 
+            // PlayerSearch
+            // 
+            PlayerSearch.BackColor = Color.FromArgb(35, 36, 37);
+            PlayerSearch.BorderStyle = BorderStyle.None;
+            PlayerSearch.Font = new Font("Segoe UI Variable Small", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            PlayerSearch.Location = new Point(38, 5);
+            PlayerSearch.MaxLength = 35;
+            PlayerSearch.Name = "PlayerSearch";
+            PlayerSearch.Size = new Size(304, 22);
+            PlayerSearch.TabIndex = 1;
+            PlayerSearch.TextChanged += PlayerSearch_TextChanged;
+            // 
+            // MainWindow
             // 
             AutoScaleDimensions = new SizeF(7F, 16F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -218,7 +278,7 @@
             FormBorderStyle = FormBorderStyle.Fixed3D;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
-            Name = "MainForm";
+            Name = "MainWindow";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "InstanceName";
             TransparencyKey = Color.Transparent;
@@ -226,6 +286,7 @@
             Load += Form_Load;
             Shown += Form_Shown;
             panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)SettingsButton).EndInit();
             ((System.ComponentModel.ISupportInitialize)CloseInstanceButton).EndInit();
             ((System.ComponentModel.ISupportInitialize)ManageStaffButton).EndInit();
             ((System.ComponentModel.ISupportInitialize)PublishCommitButton).EndInit();
@@ -235,6 +296,9 @@
             betterPanel1.PerformLayout();
             GroupPanelBase.ResumeLayout(false);
             PlayersPanelBase.ResumeLayout(false);
+            betterPanel2.ResumeLayout(false);
+            betterPanel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
         }
 
@@ -254,5 +318,9 @@
         private PictureBox PublishCommitButton;
         private PictureBox ManageStaffButton;
         private PictureBox CloseInstanceButton;
+        private PictureBox SettingsButton;
+        private TextBox PlayerSearch;
+        private MagmaMc.BetterForms.BetterPanel betterPanel2;
+        private PictureBox pictureBox1;
     }
 }

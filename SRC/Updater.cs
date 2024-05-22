@@ -4,11 +4,11 @@ using System.Text.Json;
 namespace VRCWMT;
 public class Version : IComparable<Version>
 {
-    private readonly byte major;
-    private readonly byte minor;
-    private readonly byte patch;
-    private readonly string edition;
-    private Uri? updateURL;
+    public byte major { get; private set; }
+    public byte minor { get; private set; }
+    public byte patch { get; private set; }
+    public string edition { get; private set; }
+    public Uri? updateURL { get; private set; }
 
     public Version(byte major, byte minor, byte patch, string edition = "")
     {
@@ -60,7 +60,10 @@ public class Version : IComparable<Version>
 #endif
             var updateInfo = JsonDocument.Parse(json);
 
-            return new(updateInfo.RootElement.GetProperty("Version").GetString()!);
+            return new(updateInfo.RootElement.GetProperty("version").GetString()!)
+            {
+                updateURL = new Uri(updateInfo.RootElement.GetProperty("downloadURL").GetString()!)
+            };
         }
         catch (Exception ex)
         {

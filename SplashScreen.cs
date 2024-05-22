@@ -32,6 +32,6 @@ public partial class SplashScreen : Form
 
     private void Loaded(object sender, EventArgs e)
     {
-        label1.Text += "0.3.0";
+        label1.Text += Client.Version.ToString();
     }
 }

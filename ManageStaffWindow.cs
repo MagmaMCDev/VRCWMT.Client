@@ -6,11 +6,12 @@ using MagmaMC.SharedLibrary;
 using VRCWMT.Models;
 
 namespace VRCWMT;
-public partial class ManageStaffForm : Form
+public partial class ManageStaffWindow : Form
 {
     private readonly VRCW VRCWorld;
-    private readonly Dictionary<string, Control[]> PlayerControls = new();
-    public ManageStaffForm(VRCW World)
+    private readonly Dictionary<string, Control[]> StaffControls = new();
+    private readonly Dictionary<string, Control[]> ModControls = new();
+    public ManageStaffWindow(VRCW World)
     {
         VRCWorld = World;
         InitializeComponent();
@@ -23,7 +24,7 @@ public partial class ManageStaffForm : Form
         UsersPanel.AutoScroll = true;
         UsersPanel.VerticalScroll.Visible = true;
         UsersPanel.VerticalScroll.Enabled = true;
-        UpdatePlayers();
+        betterRadioButton2.Checked = true;
         ColoredPictureBox AddButton = new ColoredPictureBox
         {
             Image = AppResources.Material_Symbols_Add,
@@ -47,10 +48,14 @@ public partial class ManageStaffForm : Form
                 return;
             if (Username.Value.Trim().ToLower() == VRCWorld.worldCreator.Trim().ToLower())
                 return;
-            if (PlayerControls.ContainsKey(Username.Value.Trim()))
+            if (StaffControls.ContainsKey(Username.Value.Trim()))
                 return;
 
-            VRCWorld.AddStaff(Username.Value.Trim()).ConfigureAwait(false);
+            if (betterRadioButton2.Checked)
+                VRCWorld.AddStaff(Username.Value.Trim()).ConfigureAwait(false);
+            else
+                VRCWorld.AddMod(Username.Value.Trim()).ConfigureAwait(false);
+            Thread.Sleep(50);
             UpdatePlayers();
         };
 
@@ -63,7 +68,7 @@ public partial class ManageStaffForm : Form
             ForeColor = Color.Wheat,
         };
 
-        PlayerControls.Add(VRCWorld.worldCreator,
+        StaffControls.Add(VRCWorld.worldCreator,
         [
             WorldCreator_Username
         ]);
@@ -80,8 +85,13 @@ public partial class ManageStaffForm : Form
     {
         if (VRCWorld != null)
         {
-            var Staff = VRCWorld.GetStaff();
-            if (Staff == null)
+            bool write = betterRadioButton2.Checked;
+            string[]? Members;
+            if (write)
+                Members = VRCWorld.GetStaff();
+            else
+                Members = VRCWorld.GetMods();
+            if (Members == null)
                 return;
 
             ushort xIndex = 0;
@@ -94,10 +104,11 @@ public partial class ManageStaffForm : Form
             {
                 foreach (Control item in UsersPanel.Controls)
                     item.Dispose();
-                PlayerControls.Clear();
+                StaffControls.Clear();
+                ModControls.Clear();
                 UsersPanel.Controls.Clear();
 
-                foreach (var item in Staff)
+                foreach (var item in Members)
                 {
                     Label Username = new Label
                     {
@@ -124,8 +135,12 @@ public partial class ManageStaffForm : Form
                     DeleteButton.MouseDown += (_, _) =>
                     {
                         VRCWorld.RemoveStaff(item).ConfigureAwait(false);
-                        foreach (Control item in PlayerControls[item])
-                            item.Dispose();
+                        if (write)
+                            foreach (Control item in StaffControls[item])
+                                item.Dispose();
+                        else
+                            foreach (Control item in ModControls[item])
+                                item.Dispose();
 
                         Control[] controls = new Control[UsersPanel.Controls.Count];
                         UsersPanel.Controls.CopyTo(controls, 0);
@@ -133,20 +148,29 @@ public partial class ManageStaffForm : Form
                             if (item.Disposing || item.IsDisposed) UsersPanel.Controls.Remove(item);
                     };
 
-                    PlayerControls.Add(item,
-                    [
-                        Username,
-                        DeleteButton
-                    ]);
+                    if (write)
+                        StaffControls.Add(item,
+                        [
+                            Username,
+                            DeleteButton
+                        ]);
+                    else
+                        ModControls.Add(item,
+                        [
+                            Username,
+                            DeleteButton
+                        ]);
 
                     UsersPanel.Controls.Add(Username);
                     UsersPanel.Controls.Add(DeleteButton);
-
                     xIndex++;
                 }
             });
             UsersPanel.VerticalScroll.Maximum = panelHeight;
+            if (Config.FastGC)
+                GC.Collect();
         }
+
     }
 
     private void WorldDesc_Input_TextChanged(object sender, EventArgs e)
@@ -178,4 +202,6 @@ public partial class ManageStaffForm : Form
             });
         }).Start();
     }
+
+    private void UpdateAccess(object sender, EventArgs e) => UpdatePlayers();
 }

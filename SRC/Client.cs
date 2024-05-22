@@ -1,32 +1,32 @@
-﻿using KPreisser.UI;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+﻿using System.Drawing.Drawing2D;
+using KPreisser.UI;
 using TaskDialog = KPreisser.UI.TaskDialog;
 
 namespace VRCWMT;
 
 internal class Client
 {
-    public static string User_Agent = "VRChat-World-Moderation-Tool.Client - " + Environment.OSVersion.Platform + $" - {Environment.OSVersion.VersionString.Replace(" ", "-")}";
+    public static string User_Agent = "VRChat-World-Moderation-Tool.Client-" + Environment.OSVersion.Platform + $"-{Environment.OSVersion.VersionString.Replace(" ", "-")}";
 #pragma warning disable CS8618
     public static Version Version
     {
         get;
         private set;
-    } = new("0.3.0");
+    } = new("0.4.0");
     public static string[] Arguments
     {
         get;
         private set;
     }
     private readonly NotifyIcon TaskIcon = new();
-    private MainForm Window;
+    private MainWindow Window;
     public Client(string[] Args)
     {
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
         Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
-        Config.Setup();
-        Version.SetUpdateURL("https://vrc.magmamc.dev/API/V1/Version");
+        Config.SetupConfig();
+        Version.SetUpdateURL("https://vrc.magmamc.dev/API/V2/Version/Latest");
         Arguments = Args;
         Start();
     }
@@ -53,7 +53,7 @@ internal class Client
             Window.Hide();
             Window.Dispose();
             Config.GithubAuth = "";
-            Config.Write();
+            Config.WriteConfig();
             Application.Restart();
 
         });
@@ -72,7 +72,7 @@ internal class Client
         TaskIcon.DoubleClick += (sender, e) => Window.ShowWindow();
         TaskIcon.Visible = true;
 
-        Window = new MainForm(SS);
+        Window = new MainWindow(SS);
         Application.Run(Window);
     }
 }

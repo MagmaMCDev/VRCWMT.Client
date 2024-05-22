@@ -1,20 +1,6 @@
-﻿using KPreisser.UI;
-using MagmaMc.JEF;
-using MagmaMc.UAS;
-using MagmaMC.SharedLibrary;
-using Microsoft.VisualBasic;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+﻿using MagmaMC.SharedLibrary;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using VRCWMT.Models;
-using TaskDialog = KPreisser.UI.TaskDialog;
 
 namespace VRCWMT;
 
@@ -31,10 +17,6 @@ public partial class WelcomeWizard : Form
 
     }
 
-    private void textBox1_TextChanged(object sender, EventArgs e)
-    {
-
-    }
 
     private void Click_CreateWorld_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
     {
@@ -74,7 +56,7 @@ public partial class WelcomeWizard : Form
                 });
                 return;
             }
-            if (!User.siteAdmin && !User.worldCreator && !User.siteOwner)
+            if (!User.siteAdmin && !User.worldCreator && !User.siteOwner && !User.read)
             {
                 Invoke((MethodInvoker)delegate
                 {
@@ -86,7 +68,7 @@ public partial class WelcomeWizard : Form
             Invoke((MethodInvoker)delegate
             {
                 Config.WorldID = WorldID_Input.Text;
-                Config.Write();
+                Config.WriteConfig();
                 Canceled = false;
                 Close();
             });

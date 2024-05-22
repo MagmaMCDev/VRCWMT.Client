@@ -118,46 +118,55 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="Icon_New" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\Icon_New.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="VRChatBanner_UC" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\VRChatBanner_UC.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="VRChatBanner" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\VRChatBanner_.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="VRCWMT" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\VRCWMT.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="VRCWMT1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\VRCWMT.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Material_Symbols_Add" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Material_Symbols_Add.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Contacting" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Contacting.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Material_symbols_Delete" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\Material_symbols_Delete.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="VRChatBanner" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\VRChatBanner_.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Icon_New" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Icon_New.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="VRCWMT1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\VRCWMT.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Material_symbols_Info" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Material_symbols_Info.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Material_symbols_Publish" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\Material_symbols_Publish.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Material_symbols_Delete" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Material_symbols_Delete.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Material_Symbols_Add" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\Material_Symbols_Add.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Material_symbols_Exit" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Material_symbols_Exit.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Material_Symbols_ManageAccount" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Material_Symbols_ManageAccount.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Material_Symbols_Remove" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\Material_Symbols_Remove.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Material_symbols_Publish" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Material_symbols_Publish.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Contacting_Alt1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\Contacting_Alt1.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Material_symbols_Exit" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Resources\Material_symbols_Exit.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Material_Symbols_Remove" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Material_Symbols_Remove.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="VRCWMT" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\VRCWMT.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="VRChatBanner_UC" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\VRChatBanner_UC.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Exampleimage" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Exampleimage.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Material_symbols_Settings" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Material_symbols_Settings.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Material_symbols_Search" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\Material_symbols_Search.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
