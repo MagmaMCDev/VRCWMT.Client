@@ -10,6 +10,8 @@ using KPreisser.UI;
 using TaskDialog = KPreisser.UI.TaskDialog;
 using MagmaMc.BetterForms;
 using static VRCWMT.Config;
+using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 
 namespace VRCWMT;
 
@@ -144,7 +146,7 @@ public partial class MainWindow : Form
         ColoredPictureBox AddGroupButton = new ColoredPictureBox
         {
             Image = AppResources.Material_Symbols_Add,
-            Location = new Point(290, 8),
+            Location = new Point(8 + 32, -2),
             Name = "AddGroup",
             Size = new Size(32, 32),
             SizeMode = PictureBoxSizeMode.Zoom,
@@ -183,7 +185,7 @@ public partial class MainWindow : Form
         ColoredPictureBox RemoveGroupButton = new ColoredPictureBox
         {
             Image = AppResources.Material_Symbols_Remove,
-            Location = new Point(290 - 32, 8),
+            Location = new Point(8, -2),
             Name = "RemoveGroup",
             Size = new Size(32, 32),
             SizeMode = PictureBoxSizeMode.Zoom,
@@ -229,8 +231,11 @@ public partial class MainWindow : Form
         if (WriteMode)
         {
             PlayersPanelBase.Controls.Add(AddButton);
-            GroupPanelBase.Controls.Add(AddGroupButton);
-            GroupPanelBase.Controls.Add(RemoveGroupButton);
+
+            initialControlPositions.Add("GroupPanel", [overlay_GroupControls.Location]);
+            scrollableControls.Add("GroupPanel", [overlay_GroupControls]);
+            overlay_GroupControls.Controls.Add(AddGroupButton);
+            overlay_GroupControls.Controls.Add(RemoveGroupButton);
         }
 
         GroupPanelInternal.AutoScroll = true;
@@ -274,8 +279,8 @@ public partial class MainWindow : Form
         if (Client.Version < LatestV)
         {
             splashScreen.Hide();
-            if (TaskDialog.Show(text: "You are on an outdated version. Do you wish to update?",
-                                title: "VRCWMT",
+            if (TaskDialog.Show(text: $"You are on an outdated version.\r\nDo you wish to update to Version: {LatestV}",
+                                title: "Auto Updater",
                                 buttons: TaskDialogButtons.Yes | TaskDialogButtons.No,
                                 icon: TaskDialogStandardIcon.Information) == TaskDialogResult.Yes)
             {
@@ -362,7 +367,7 @@ public partial class MainWindow : Form
                         UpdateContainers();
                         EndData();
                     }).Start();
-                
+
             }
         }
         #endregion
@@ -504,7 +509,7 @@ public partial class MainWindow : Form
                         ushort margin = 10;
                         ushort maxControlsPerColumn = 7;
                         var panelHeight = maxControlsPerColumn * (controlHeight + margin);
-
+                        BetterRadioButton? internalcheckBox = null;
                         Invoke((MethodInvoker)delegate
                         {
                             DisposeGroups();
@@ -517,15 +522,24 @@ public partial class MainWindow : Form
                                     Location = new Point(10, margin + (xIndex * (controlHeight + margin))),
                                     ForeColor = Color.Wheat,
                                 };
-                                checkBox.MouseUp += (sender, e) =>
+                                checkBox.Click += (sender, e) =>
                                 {
                                     CurrentGroup = checkBox.Text;
                                     UpdatePlayers();
                                 };
+
+                                if (string.IsNullOrEmpty(CurrentGroup) && internalcheckBox == null)
+                                    internalcheckBox = checkBox;
+
                                 GroupPanelInternal.Controls.Add(checkBox);
                                 xIndex++;
                             }
-
+                            if (internalcheckBox != null)
+                            {
+                                internalcheckBox.Checked = true;
+                                CurrentGroup = internalcheckBox.Text;
+                                UpdatePlayers();
+                            }
                             GroupPanelInternal.VerticalScroll.Maximum = panelHeight;
                         });
 
@@ -834,11 +848,18 @@ public partial class MainWindow : Form
         else
         {
             var controls = GroupPanelInternal.Controls.Cast<Control>().ToArray();
-
+            List<Control> newlist = new();
             for (int i = 0; i < controls.Length; i++)
-                controls[i].Dispose();
+            {
+                if (controls[i].Name.StartsWith("overlay"))
+                    continue;
+                else
+                {
 
-            GroupPanelInternal.Controls.Clear();
+                    controls[i].Dispose();
+                    GroupPanelInternal.Controls.RemoveAt(i);
+                }
+            }
             GroupControls.Clear();
         }
     }
@@ -911,7 +932,8 @@ public partial class MainWindow : Form
                 if (FastGC)
                     GC.Collect();
             };
-        }else
+        }
+        else
         {
             Hide();
             Opacity = 0.0f;
@@ -956,6 +978,44 @@ public partial class MainWindow : Form
             }
         });
     }
+    private Dictionary<string, List<Point>> initialControlPositions = new Dictionary<string, List<Point>>();
+    private Dictionary<string, Control[]> scrollableControls = new Dictionary<string, Control[]>();
+
+    private void GroupPanel_Scroll(object sender, ScrollEventArgs e)
+    {
+        if (!initialControlPositions.ContainsKey("GroupPanel") || !scrollableControls.ContainsKey("GroupPanel"))
+            return;
+
+        var controls = scrollableControls["GroupPanel"];
+        var initialPositions = initialControlPositions["GroupPanel"];
+
+        for (int i = 0; i < controls.Length; i++)
+        {
+            Control control = controls[i];
+            Point initialPosition = initialPositions[i];
+            control.Location = new Point(initialPosition.X, initialPosition.Y);
+        }
+    }
+    private void GroupPanel_MouseWheel(object sender, MouseEventArgs e)
+    {
+        if (!initialControlPositions.ContainsKey("GroupPanel") || !scrollableControls.ContainsKey("GroupPanel"))
+            return;
+
+        var controls = scrollableControls["GroupPanel"];
+        var initialPositions = initialControlPositions["GroupPanel"];
+
+        for (int i = 0; i < controls.Length; i++)
+        {
+            Control control = controls[i];
+            Point initialPosition = initialPositions[i];
+
+            // Calculate the new Y position based on the change in vertical scroll value
+            int newY = initialPosition.Y - (GroupPanelInternal.VerticalScroll.Value - GroupPanelInternal.VerticalScroll.Minimum);
+
+            control.Location = new Point(control.Location.X, initialPosition.Y);
+        }
+    }
+
 
 
     public bool CanEdit
@@ -967,5 +1027,10 @@ public partial class MainWindow : Form
 
             return true;
         }
+    }
+
+    private void PlayersPanel_Scroll(object sender, ScrollEventArgs e)
+    {
+
     }
 }

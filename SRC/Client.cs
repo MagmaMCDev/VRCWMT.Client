@@ -12,7 +12,7 @@ internal class Client
     {
         get;
         private set;
-    } = new("0.4.0");
+    } = new("0.4.1");
     public static string[] Arguments
     {
         get;

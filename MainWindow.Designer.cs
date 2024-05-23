@@ -42,6 +42,7 @@
             label1 = new Label();
             GroupPanelBase = new MagmaMc.BetterForms.BetterPanel();
             GroupPanelInternal = new Panel();
+            overlay_GroupControls = new MagmaMc.BetterForms.BetterPanel();
             PlayersPanelBase = new MagmaMc.BetterForms.BetterPanel();
             PlayersPanelInternal = new Panel();
             betterPanel2 = new MagmaMc.BetterForms.BetterPanel();
@@ -56,6 +57,7 @@
             ((System.ComponentModel.ISupportInitialize)ContactingServerGIF).BeginInit();
             betterPanel1.SuspendLayout();
             GroupPanelBase.SuspendLayout();
+            GroupPanelInternal.SuspendLayout();
             PlayersPanelBase.SuspendLayout();
             betterPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
@@ -171,7 +173,7 @@
             Commits.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             Commits.BackColor = Color.FromArgb(25, 26, 27);
             Commits.Font = new Font("Segoe UI Variable Small", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            Commits.ForeColor = SystemColors.WindowText;
+            Commits.ForeColor = Color.WhiteSmoke;
             Commits.Location = new Point(16, 41);
             Commits.Name = "Commits";
             Commits.Size = new Size(334, 121);
@@ -205,10 +207,24 @@
             // GroupPanelInternal
             // 
             GroupPanelInternal.BackColor = Color.FromArgb(25, 26, 27);
-            GroupPanelInternal.Location = new Point(6, 32);
+            GroupPanelInternal.Controls.Add(overlay_GroupControls);
+            GroupPanelInternal.Location = new Point(6, 7);
             GroupPanelInternal.Name = "GroupPanelInternal";
-            GroupPanelInternal.Size = new Size(341, 184);
+            GroupPanelInternal.Size = new Size(341, 209);
             GroupPanelInternal.TabIndex = 0;
+            GroupPanelInternal.Scroll += GroupPanel_Scroll;
+            GroupPanelInternal.MouseWheel += GroupPanel_MouseWheel;
+            // 
+            // overlay_GroupControls
+            // 
+            overlay_GroupControls.BackColor = Color.FromArgb(35, 36, 37);
+            overlay_GroupControls.BorderColor = Color.FromArgb(25, 26, 27);
+            overlay_GroupControls.BorderCurve = 12F;
+            overlay_GroupControls.BorderSize = 0F;
+            overlay_GroupControls.Location = new Point(247, 3);
+            overlay_GroupControls.Name = "overlay_GroupControls";
+            overlay_GroupControls.Size = new Size(77, 25);
+            overlay_GroupControls.TabIndex = 1;
             // 
             // PlayersPanelBase
             // 
@@ -225,10 +241,11 @@
             // 
             // PlayersPanelInternal
             // 
-            PlayersPanelInternal.Location = new Point(6, 34);
+            PlayersPanelInternal.Location = new Point(6, 36);
             PlayersPanelInternal.Name = "PlayersPanelInternal";
             PlayersPanelInternal.Size = new Size(416, 361);
             PlayersPanelInternal.TabIndex = 0;
+            PlayersPanelInternal.Scroll += PlayersPanel_Scroll;
             // 
             // betterPanel2
             // 
@@ -238,15 +255,16 @@
             betterPanel2.BorderSize = 0F;
             betterPanel2.Controls.Add(pictureBox1);
             betterPanel2.Controls.Add(PlayerSearch);
-            betterPanel2.Location = new Point(5, 5);
+            betterPanel2.ForeColor = Color.WhiteSmoke;
+            betterPanel2.Location = new Point(5, 7);
             betterPanel2.Name = "betterPanel2";
-            betterPanel2.Size = new Size(350, 31);
+            betterPanel2.Size = new Size(350, 27);
             betterPanel2.TabIndex = 0;
             // 
             // pictureBox1
             // 
             pictureBox1.Image = AppResources.Material_symbols_Search;
-            pictureBox1.Location = new Point(5, 1);
+            pictureBox1.Location = new Point(6, -1);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(34, 29);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
@@ -258,10 +276,10 @@
             PlayerSearch.BackColor = Color.FromArgb(35, 36, 37);
             PlayerSearch.BorderStyle = BorderStyle.None;
             PlayerSearch.Font = new Font("Segoe UI Variable Small", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            PlayerSearch.Location = new Point(38, 5);
+            PlayerSearch.Location = new Point(38, 1);
             PlayerSearch.MaxLength = 35;
             PlayerSearch.Name = "PlayerSearch";
-            PlayerSearch.Size = new Size(304, 22);
+            PlayerSearch.Size = new Size(297, 22);
             PlayerSearch.TabIndex = 1;
             PlayerSearch.TextChanged += PlayerSearch_TextChanged;
             // 
@@ -295,6 +313,7 @@
             betterPanel1.ResumeLayout(false);
             betterPanel1.PerformLayout();
             GroupPanelBase.ResumeLayout(false);
+            GroupPanelInternal.ResumeLayout(false);
             PlayersPanelBase.ResumeLayout(false);
             betterPanel2.ResumeLayout(false);
             betterPanel2.PerformLayout();
@@ -322,5 +341,6 @@
         private TextBox PlayerSearch;
         private MagmaMc.BetterForms.BetterPanel betterPanel2;
         private PictureBox pictureBox1;
+        private MagmaMc.BetterForms.BetterPanel overlay_GroupControls;
     }
 }

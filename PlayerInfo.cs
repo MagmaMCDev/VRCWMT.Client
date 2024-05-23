@@ -1,9 +1,11 @@
 ﻿using System.Diagnostics;
 using System.Text.RegularExpressions;
+using KPreisser.UI;
 using MagmaMc.UAS;
 using MagmaMC.SharedLibrary;
 using OpenVRChatAPI.Models;
 using VRCWMT.Models;
+using TaskDialog = KPreisser.UI.TaskDialog;
 
 namespace VRCWMT;
 
@@ -30,6 +32,18 @@ public partial class PlayerInfo : Form
         Text += player.displayName;
         Timeadded.Text = $"{player.timeAdded.ToLocalTime():d/M/yy h:mm tt}";
         PermissionMessage.Text = player.userAdded + ": " + player.message;
+        bool debounce = false;
+        PermissionMessage.DoubleClick += (_, __) =>
+        {
+            if (debounce)
+                return;
+            debounce = true;
+            TaskDialog.Show(text: player.message,
+                buttons: TaskDialogButtons.OK,
+                icon: TaskDialogStandardIcon.None,
+                title: player.userAdded + $": {player.displayName} - {player.timeAdded.ToLocalTime():d/M/yy h:mm tt}");
+            debounce = false;
+        };
         Task.Run(() =>
         {
             VRCUser user = user = world.GetVRCUser(player.playerID)!;
@@ -38,21 +52,25 @@ public partial class PlayerInfo : Form
             if (!string.IsNullOrEmpty(user.userIcon))
                 Icon = DownloadImage(ref httpClient, user.userIcon);
 
-            SmallIcon.Invoke((MethodInvoker)delegate
-            {
-                SmallIcon.Image = Icon;
-            });
+            if (!Disposing && !IsDisposed)
+                SmallIcon.Invoke((MethodInvoker)delegate
+                {
+                    SmallIcon.Image = Icon;
+                });
+            else
+                return;
 
             if (!string.IsNullOrEmpty(user.profilePicOverride))
                 Banner = DownloadImage(ref httpClient, user.profilePicOverride);
             else
                 Banner = DownloadImage(ref httpClient, user.currentAvatarThumbnailImageUrl);
 
-            if (Banner != null)
-                SmallIcon.Invoke((MethodInvoker)delegate
-                {
-                    BannerImage.Image = Banner;
-                });
+            if (!Disposing && !IsDisposed)
+                if (Banner != null)
+                    SmallIcon.Invoke((MethodInvoker)delegate
+                    {
+                        BannerImage.Image = Banner;
+                    });
             httpClient.Dispose();
         });
     }

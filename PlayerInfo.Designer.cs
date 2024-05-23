@@ -68,9 +68,9 @@
             Timeadded.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             Timeadded.Font = new Font("Segoe UI Variable Small", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             Timeadded.ForeColor = Color.WhiteSmoke;
-            Timeadded.Location = new Point(331, 85);
+            Timeadded.Location = new Point(317, 85);
             Timeadded.Name = "Timeadded";
-            Timeadded.Size = new Size(101, 16);
+            Timeadded.Size = new Size(115, 16);
             Timeadded.TabIndex = 4;
             Timeadded.TextAlign = ContentAlignment.TopRight;
             // 
