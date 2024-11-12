@@ -111,11 +111,11 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(16, 18, 22);
             ClientSize = new Size(435, 344);
-            Controls.Add(PermissionMessage);
             Controls.Add(BannerImage);
             Controls.Add(SmallIcon);
             Controls.Add(Timeadded);
             Controls.Add(PlayerName_Control);
+            Controls.Add(PermissionMessage);
             ForeColor = Color.White;
             FormBorderStyle = FormBorderStyle.FixedDialog;
             Icon = (Icon)resources.GetObject("$this.Icon");

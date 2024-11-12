@@ -12,7 +12,7 @@ internal class Client
     {
         get;
         private set;
-    } = new("0.4.1");
+    } = new("0.5.0");
     public static string[] Arguments
     {
         get;
@@ -26,7 +26,7 @@ internal class Client
         Application.SetCompatibleTextRenderingDefault(false);
         Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
         Config.SetupConfig();
-        Version.SetUpdateURL("https://vrc.magmamc.dev/API/V2/Version/Latest");
+        Version.SetUpdateURL("https://vrc.magmamc.dev/API/V3/Version/Latest");
         Arguments = Args;
         Start();
     }

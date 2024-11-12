@@ -58,7 +58,7 @@
             PlayerID.AccessibleRole = AccessibleRole.Text;
             PlayerID.BackColor = Color.FromArgb(5, 25, 29);
             PlayerID.BorderStyle = BorderStyle.None;
-            PlayerID.CharacterCasing = CharacterCasing.Upper;
+            PlayerID.CharacterCasing = CharacterCasing.Lower;
             PlayerID.Font = new Font("Segoe UI", 12F);
             PlayerID.ForeColor = Color.FromArgb(79, 227, 249);
             PlayerID.Location = new Point(10, 11);

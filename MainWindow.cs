@@ -42,7 +42,7 @@ public partial class MainWindow : Form
 
     public async Task GithubLogin()
     {
-        ProcessStartInfo PSI = new("https://vrc.magmamc.dev/API/V1/Client/Login");
+        ProcessStartInfo PSI = new("https://vrc.magmamc.dev/API/V3/Client/Login");
         PSI.UseShellExecute = true;
         Process.Start(PSI);
 
@@ -342,7 +342,7 @@ public partial class MainWindow : Form
         else
         {
             splashScreen.Status.Text = "Checking WorldID...";
-            if (!Regex.Match(Config.WorldID, @"^WRD_[0-9A-Z]{32}$").Success)
+            if (!Regex.Match(Config.WorldID, @"^WRD_[0-9A-Z]{16}$").Success)
                 OpenWizard = true;
             else if (API.GetWorld(Config.WorldID) == null)
                 OpenWizard = true;
@@ -434,15 +434,14 @@ public partial class MainWindow : Form
     SiteUser user;
     private void LoadForm()
     {
-
-        WriteMode = !user.read || user.siteOwner;
+        WriteMode = true;
         CurrentWorld = API.GetWorld(Config.WorldID)!;
         githubUser = Github.GetUserAsync(Config.GithubAuth).GetResult();
-        if (!user.worldCreator)
+        if (!user?.worldCreator ?? false)
             ManageStaffButton.Visible = false;
 
         Text = CurrentWorld.worldName;
-        if (user.read && !user.siteOwner)
+        if (user?.read ?? true && (!user?.siteOwner ?? false))
             Text += " READ MODE!";
         FormBorderStyle = FormBorderStyle.Fixed3D;
         ShowInTaskbar = true;
@@ -460,7 +459,8 @@ public partial class MainWindow : Form
         Initialized = false;
         Config.WorldID = "";
         Config.WriteConfig();
-        WriteMode = !user.read || user.siteOwner;
+        if (user != null)
+            WriteMode = !user.read || user.siteOwner;
         WelcomeWizard welcomeWizard = new();
         welcomeWizard.ShowDialog();
         welcomeWizard.Dispose();
@@ -848,16 +848,13 @@ public partial class MainWindow : Form
         else
         {
             var controls = GroupPanelInternal.Controls.Cast<Control>().ToArray();
-            List<Control> newlist = new();
             for (int i = 0; i < controls.Length; i++)
             {
                 if (controls[i].Name.StartsWith("overlay"))
                     continue;
                 else
                 {
-
                     controls[i].Dispose();
-                    GroupPanelInternal.Controls.RemoveAt(i);
                 }
             }
             GroupControls.Clear();

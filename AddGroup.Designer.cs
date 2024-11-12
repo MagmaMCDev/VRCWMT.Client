@@ -125,7 +125,6 @@
             GroupPermissions.AccessibleRole = AccessibleRole.Text;
             GroupPermissions.BackColor = Color.FromArgb(5, 25, 29);
             GroupPermissions.BorderStyle = BorderStyle.None;
-            GroupPermissions.CharacterCasing = CharacterCasing.Upper;
             GroupPermissions.Font = new Font("Segoe UI", 12F);
             GroupPermissions.ForeColor = Color.FromArgb(79, 227, 249);
             GroupPermissions.Location = new Point(10, 11);

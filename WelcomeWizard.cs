@@ -36,7 +36,7 @@ public partial class WelcomeWizard : Form
         }
         new Thread(() =>
         {
-            if (!Regex.Match(WorldID_Input.Text, @"^WRD_[0-9A-Z]{32}$").Success || API.GetWorld(WorldID_Input.Text) == null)
+            if (!Regex.Match(WorldID_Input.Text, @"^WRD_[0-9A-Z]{16}$").Success || API.GetWorld(WorldID_Input.Text) == null)
             {
                 Invoke((MethodInvoker)delegate
                 {

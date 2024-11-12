@@ -17,7 +17,7 @@ public static class API
     private static readonly ConcurrentDictionary<string, VRCW> _worldCache = new();
 
 
-    public const string APIBase = "https://vrc.magmamc.dev/API/V2/";
+    public const string APIBase = "https://vrc.magmamc.dev/API/V3/";
     public static Uri APIUriBase => new(APIBase);
 
 

@@ -13,6 +13,8 @@ public partial class AddPlayer : Form
     }
     private void AddPlayer_Click(object sender, EventArgs e)
     {
+        if (PlayerID.Text.StartsWith("https://vrchat.com/home/user/"))
+            PlayerID.Text = PlayerID.Text.Replace("https://vrchat.com/home/user/", "");
         if (!Regex.Match(PlayerID.Text.ToLower(), @"^(usr_)?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$").Success)
         {
             MessageBox.Show("PlayerID Invalid", "VRCWMT", MessageBoxButtons.OK, MessageBoxIcon.Error);
